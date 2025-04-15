@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 
 const app = express();
@@ -6,31 +6,23 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 
-app.get('/phase-change-diagram', (req, res) => {
-  const pressure = parseFloat(req.query.pressure as string);
+app.get('/phase-change-diagram', (req: Request, res: Response) => {
+  const pressure = Number(req.query.pressure);
 
   if (isNaN(pressure)) {
-    return res.status(400).json({ error: 'Invalid pressure value' });
+    return res.status(400).json({ error: 'Invalid pressure parameter' });
   }
 
-  // Simulación básica basada en el gráfico (puedes agregar más valores si tienes más puntos)
-  const data: Record<number, { specific_volume_liquid: number; specific_volume_vapor: number }> = {
-    0.05: {
-      specific_volume_liquid: 0.00105,
-      specific_volume_vapor: 0.03,
-    },
-    10: {
+  // Ejemplo básico según imagen para 10 MPa
+  if (pressure === 10) {
+    return res.json({
       specific_volume_liquid: 0.0035,
       specific_volume_vapor: 0.0035,
-    },
-  };
-
-  const result = data[pressure];
-  if (!result) {
-    return res.status(404).json({ error: 'Pressure value not found in diagram' });
+    });
   }
 
-  res.json(result);
+  // Puedes agregar más casos aquí si tienes más datos
+  return res.status(404).json({ error: 'Pressure not found in database' });
 });
 
 app.listen(port, () => {
